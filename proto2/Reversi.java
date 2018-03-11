@@ -1,9 +1,7 @@
 package reversi;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
 public class Reversi {
@@ -12,40 +10,23 @@ public class Reversi {
 		// TODO 自動生成されたコンストラクター・スタブ
 	}
 
-	int boardSize = 8; // 盤面の大きさ
+	int boardSize = 8; // 1列のマスの数
 	int[] start = { 30, 30 }; // 盤面の位置
 	int width = 50; // マスの横幅
 	int height = 50; // マスの縦幅
+	/*
+	 * 石を反転させる数 添え字は8方位のうちの対応したいずれかである
+	 *
+	 * changeNum[i] > 0 その数だけ反転させる changeNum[i] == 0 反転する可能性がある changeNum[i] < 0
+	 * 反転しない
+	 */
 	int[] changeNum = new int[8];
 	/*
 	 * 石の配置 0：何もない 1：黒 2：白
 	 */
 	int[][] board = new int[boardSize][boardSize];
-	boolean turn = true;
-
-	public void paint(Graphics g) {
-		// 盤の表示
-		for (int i = start[0]; i < start[0] + width * boardSize; i += width) {
-			for (int j = start[1]; j < start[1] + height * boardSize; j += height) {
-				g.setColor(Color.black);
-				g.drawRect(i, j, width, height);
-				g.setColor(Color.green);
-				g.fillRect(i + 1, j + 1, width - 1, height - 1);
-			}
-		}
-		setDisks(g);
-		g.setColor(Color.white);
-		g.fillRect(start[0], 450, 200, 100);
-
-		g.setColor(Color.black);
-
-		Font fnt = new Font("SansSerif", Font.BOLD, 22);
-		g.setFont(fnt);
-		if (turn)
-			g.drawString("黒の番です。", start[0], 500);
-		else
-			g.drawString("白の番です。", start[0], 500);
-	}
+	boolean turn = true; //
+	int[] diskCounts = { 2, 2 }; // 石の数
 
 	/**
 	 * 石の配置の初期化
@@ -56,10 +37,13 @@ public class Reversi {
 				board[i][j] = 0;
 			}
 		}
-		board[3][3] = 2;
-		board[3][4] = 1;
-		board[4][3] = 1;
-		board[4][4] = 2;
+		int cx = (int) (boardSize / 2) - 1;
+		int cy = (int) (boardSize / 2) - 1;
+
+		board[cx][cy] = 2;
+		board[cx][cy + 1] = 1;
+		board[cx + 1][cy] = 1;
+		board[cx + 1][cy + 1] = 2;
 	}
 
 	/**
@@ -86,157 +70,160 @@ public class Reversi {
 	 * その位置に石が置けるか判定 置ける場合はtrue、それ以外はfalseを返す
 	 *
 	 * @param i
+	 *                置きたいマスのx軸方向の位置
 	 * @param j
-	 * @return place
+	 *                置きたいマスのy軸方向の位置
+	 * @return place 置けるかどうか )
 	 */
-	public boolean enablePlace(int i, int j) {
+	public boolean enablePlace(int i, int j, boolean turn) {
 		boolean place = false;
 		int disk = turn ? 1 : 2;
 		int diskR = turn ? 2 : 1;
 		Arrays.fill(changeNum, 0);
-
-		if (board[i][j] == 0) {
-			// 上
-			for (int k = 1; k < j + 1; k++) {
-				if (board[i][j - k] == 0) { // 石が置かれていないとき
-					break;
-				} else if (board[i][j - k] == disk) { // 自分の石と同じ色のとき
-					if (k == 1) {
-						break;
-					} else {
-						place = true;
-						changeNum[1] = k - 1;
-						break;
+		if (i >= 0 && j >= 0 && i < boardSize && j < boardSize && board[i][j] == 0)
+			for (int k = 1; k < boardSize; k++) {
+				if (i - k >= 0 && j - k >= 0 && changeNum[0] == 0) { // 左上
+					if (board[i - k][j - k] == 0) { // 石が置かれていないとき
+						changeNum[0] = -1;
+					} else if (board[i - k][j - k] == disk) { // 自分の石と同じ色のとき
+						if (k == 1) {
+							changeNum[0] = -1;
+						} else {
+							place = true;
+							changeNum[0] = k - 1;
+						}
+					} else if (board[i][j - k] == diskR) { // 相手の石と同じ色のとき
+						if (i - k == 0 || j - k == 0) {
+							changeNum[0] = -1;
+						}
 					}
-				} else if (board[i][j - k] == diskR) { // 相手の石と同じ色のとき
-
 				}
-			}
-			// 右
-			for (int k = 1; k < boardSize - i; k++) { // 石が置かれていないとき
-				if (board[i + k][j] == 0) {
-					break;
-				} else if (board[i + k][j] == disk) { // 自分の石と同じ色のとき
-					if (k == 1) {
-						break;
-					} else {
-						place = true;
-						changeNum[3] = k - 1;
-						break;
+				if (j - k >= 0 && changeNum[1] == 0) { // 上
+					if (board[i][j - k] == 0) { // 石が置かれていないとき
+						changeNum[1] = -1;
+					} else if (board[i][j - k] == disk) { // 自分の石と同じ色のとき
+						if (k == 1) {
+							changeNum[1] = -1;
+						} else {
+							place = true;
+							changeNum[1] = k - 1;
+						}
+					} else if (board[i][j - k] == diskR) { // 相手の石と同じ色のとき
+						if (j - k == 0) {
+							changeNum[1] = -1;
+						}
 					}
-				} else if (board[i + k][j] == diskR) { // 相手の石と同じ色のとき
-
 				}
-			}
-			// 下
-			for (int k = 1; k < boardSize - j; k++) { // 石が置かれていないとき
-				if (board[i][j + k] == 0) {
-					break;
-				} else if (board[i][j + k] == disk) { // 自分の石と同じ色のとき
-					if (k == 1) {
-						break;
-					} else {
-						place = true;
-						changeNum[5] = k - 1;
-						break;
+				if (i + k < boardSize && j - k >= 0 && changeNum[2] == 0) { // 右上
+					if (board[i + k][j - k] == 0) { // 石が置かれていないとき
+						changeNum[2] = -1;
+					} else if (board[i + k][j - k] == disk) { // 自分の石と同じ色のとき
+						if (k == 1) {
+							changeNum[2] = -1;
+						} else {
+							place = true;
+							changeNum[2] = k - 1;
+						}
+					} else if (board[i + k][j - k] == diskR) { // 相手の石と同じ色のとき
+						if (i + k == boardSize || j - k == 0) {
+							changeNum[2] = -1;
+						}
 					}
-				} else if (board[i][j + k] == diskR) { // 相手の石と同じ色のとき
-
 				}
-			}
-			// 左
-			for (int k = 1; k < i + 1; k++) { // 石が置かれていないとき
-				if (board[i - k][j] == 0) {
-					break;
-				} else if (board[i - k][j] == disk) { // 自分の石と同じ色のとき
-					if (k == 1) {
-						break;
-					} else {
-						place = true;
-						changeNum[7] = k - 1;
-						break;
+				if (i + k < boardSize && changeNum[3] == 0) { // 右
+					if (board[i + k][j] == 0) { // 石が置かれていないとき
+						changeNum[3] = -1;
+					} else if (board[i + k][j] == disk) { // 自分の石と同じ色のとき
+						if (k == 1) {
+							changeNum[3] = -1;
+						} else {
+							place = true;
+							changeNum[3] = k - 1;
+						}
+					} else if (board[i + k][j] == diskR) { // 相手の石と同じ色のとき
+						if (i + k == boardSize) {
+							changeNum[3] = -1;
+						}
 					}
-				} else if (board[i - k][j] == diskR) { // 相手の石と同じ色のとき
-
 				}
-			}
-			// 左上
-			for (int k = 1; k < i + 1 && k < j + 1; k++) { // 石が置かれていないとき
-				if (board[i - k][j - k] == 0) {
-					break;
-				} else if (board[i - k][j - k] == disk) { // 自分の石と同じ色のとき
-					if (k == 1) {
-						break;
-					} else {
-						place = true;
-						changeNum[0] = k - 1;
-						break;
+				if (i + k < boardSize && j + k < boardSize && changeNum[4] == 0) { // 右下
+					if (board[i + k][j + k] == 0) { // 石が置かれていないとき
+						changeNum[4] = -1;
+					} else if (board[i + k][j + k] == disk) { // 自分の石と同じ色のとき
+						if (k == 1) {
+							changeNum[4] = -1;
+						} else {
+							place = true;
+							changeNum[4] = k - 1;
+						}
+					} else if (board[i + k][j + k] == diskR) { // 相手の石と同じ色のとき
+						if (i + k == boardSize || j + k == boardSize) {
+							changeNum[4] = -1;
+						}
 					}
-				} else if (board[i - k][j - k] == diskR) { // 相手の石と同じ色のとき
-
 				}
-			}
-			// 右上
-			for (int k = 1; k < boardSize - i && k < j + 1; k++) { // 石が置かれていないとき
-				if (board[i + k][j - k] == 0) {
-					break;
-				} else if (board[i + k][j - k] == disk) { // 自分の石と同じ色のとき
-					if (k == 1) {
-						break;
-					} else {
-						place = true;
-						changeNum[2] = k - 1;
-						break;
+				if (j + k < boardSize && changeNum[5] == 0) { // 下
+					if (board[i][j + k] == 0) { // 石が置かれていないとき
+						changeNum[5] = -1;
+					} else if (board[i][j + k] == disk) { // 自分の石と同じ色のとき
+						if (k == 1) {
+							changeNum[5] = -1;
+						} else {
+							place = true;
+							changeNum[5] = k - 1;
+						}
+					} else if (board[i][j + k] == diskR) { // 相手の石と同じ色のとき
+						if (j + k == boardSize) {
+							changeNum[5] = -1;
+						}
 					}
-				} else if (board[i + k][j - k] == diskR) { // 相手の石と同じ色のとき
-
 				}
-			}
-			// 右下
-			for (int k = 1; k < boardSize - i && k < boardSize - j; k++) { // 石が置かれていないとき
-				if (board[i + k][j + k] == 0) {
-					break;
-				} else if (board[i + k][j + k] == disk) { // 自分の石と同じ色のとき
-					if (k == 1) {
-						break;
-					} else {
-						place = true;
-						changeNum[4] = k - 1;
-						break;
+				if (i - k >= 0 && j + k < boardSize && changeNum[6] == 0) { // 左下
+					if (board[i - k][j + k] == 0) { // 石が置かれていないとき
+						changeNum[6] = -1;
+					} else if (board[i - k][j + k] == disk) { // 自分の石と同じ色のとき
+						if (k == 1) {
+							changeNum[6] = -1;
+						} else {
+							place = true;
+							changeNum[6] = k - 1;
+						}
+					} else if (board[i - k][j + k] == diskR) { // 相手の石と同じ色のとき
+						if (i - k == 0 || j + k == boardSize) {
+							changeNum[6] = -1;
+						}
 					}
-				} else if (board[i + k][j + k] == diskR) { // 相手の石と同じ色のとき
-
 				}
-			}
-			// 左下
-			for (int k = 1; k < i + 1 && k < boardSize - j; k++) { // 石が置かれていないとき
-				if (board[i - k][j + k] == 0) {
-					break;
-				} else if (board[i - k][j + k] == disk) { // 自分の石と同じ色のとき
-					if (k == 1) {
-						break;
-					} else {
-						place = true;
-						changeNum[6] = k - 1;
-						break;
+				if (i - k >= 0 && changeNum[7] == 0) { // 左
+					if (board[i - k][j] == 0) { // 石が置かれていないとき
+						changeNum[7] = -1;
+					} else if (board[i - k][j] == disk) { // 自分の石と同じ色のとき
+						if (k == 1) {
+							changeNum[7] = -1;
+						} else {
+							place = true;
+							changeNum[7] = k - 1;
+						}
+					} else if (board[i - k][j] == diskR) { // 相手の石と同じ色のとき
+						if (i - k == 0) {
+							changeNum[7] = -1;
+						}
 					}
-				} else if (board[i - k][j + k] == diskR) { // 相手の石と同じ色のとき
-
 				}
+
 			}
-		}
+
 		return place;
-
 	}
 
 	/**
 	 * 石を置けるかどうか判定
 	 */
-	public boolean enablePlace() {
+	public boolean enablePlace(boolean turn) {
 		boolean place = false;
 		for (int i = 0; i < boardSize; i++) {
 			for (int j = 0; j < boardSize; j++) {
-				place |= enablePlace(i, j);
+				place |= enablePlace(i, j, turn);
 			}
 		}
 		return place;
@@ -249,48 +236,58 @@ public class Reversi {
 	 */
 	public void reverseDisks(int i, int j) {
 		int myDisk = turn ? 1 : 2;
-		for (int k = 0; k <= changeNum[1]; k++) {
-			board[i][j - k] = myDisk;
-		}
-		for (int k = 0; k <= changeNum[3]; k++) {
-			board[i + k][j] = myDisk;
-		}
-		for (int k = 0; k <= changeNum[5]; k++) {
-			board[i][j + k] = myDisk;
-		}
-		for (int k = 0; k <= changeNum[7]; k++) {
-			board[i - k][j] = myDisk;
-		}
-		for (int k = 0; k <= changeNum[0]; k++) {
-			board[i - k][j - k] = myDisk;
-		}
-		for (int k = 0; k <= changeNum[2]; k++) {
-			board[i + k][j - k] = myDisk;
-		}
-		for (int k = 0; k <= changeNum[4]; k++) {
-			board[i + k][j + k] = myDisk;
-		}
-		for (int k = 0; k <= changeNum[6]; k++) {
-			board[i - k][j + k] = myDisk;
+
+		for (int k = 0; k < boardSize; k++) {
+			if (k <= changeNum[0]) {
+				board[i - k][j - k] = myDisk;
+			}
+			if (k <= changeNum[1]) {
+				board[i][j - k] = myDisk;
+			}
+			if (k <= changeNum[2]) {
+				board[i + k][j - k] = myDisk;
+			}
+			if (k <= changeNum[3]) {
+				board[i + k][j] = myDisk;
+			}
+			if (k <= changeNum[4]) {
+				board[i + k][j + k] = myDisk;
+			}
+			if (k <= changeNum[5]) {
+				board[i][j + k] = myDisk;
+			}
+			if (k <= changeNum[6]) {
+				board[i - k][j + k] = myDisk;
+			}
+			if (k <= changeNum[7]) {
+				board[i - k][j] = myDisk;
+			}
 		}
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
-		int x = e.getX();
-		int y = e.getY();
-		boolean onBoard = x > start[0] && x < start[0] + width * boardSize && y > start[1]
-				&& y < start[1] + height * boardSize;
-		if (onBoard) {
-			int i = (int) ((x - start[0]) / width);
-			int j = (int) ((y - start[1]) / height);
-			if (enablePlace(i, j)) {
-				reverseDisks(i, j);
-				turn = turn ? false : true;
+	public void countDisk() {
+		diskCounts[0] = 0;
+		diskCounts[1] = 0;
+		for (int i = 0; i < boardSize; i++) {
+			for (int j = 0; j < boardSize; j++) {
+				if (board[i][j] == 1)
+					diskCounts[0]++;
+				else if (board[i][j] == 2)
+					diskCounts[1]++;
 			}
 		}
+	}
 
-		repaint();
+	public String getWinner() {
+		String winner = "";
+		countDisk();
+		if(diskCounts[0]>diskCounts[1]) {
+			winner = "黒の勝ちです";
+		} else if(diskCounts[0]<diskCounts[1]) {
+			winner = "白の勝ちです";
+		} else {
+			winner = "引き分けです";
+		}
+		return winner;
 	}
 }
