@@ -9,19 +9,22 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class Main extends Applet implements MouseListener {
-	Reversi rvs;
-	int px, py;
+	Reversi rvs; 
+	int px, py; // マウスポインタの座標
 	String msg;
-	boolean isPlaying;
+	boolean isPlaying; // 現在ゲームが進行中かどうか
 
 	/*
 	 * @see java.applet.Applet#init()
+     *
+     * アップレットの各種設定を行う
 	 */
 	@Override
 	public void init() {
 		// TODO 自動生成されたメソッド・スタブ
 		super.init();
 		rvs = new Reversi();
+		rvs.initBoard();
 		int width = rvs.start[0] * 2 + rvs.width * rvs.boardSize;
 		int height = rvs.start[1] * 2 + rvs.height * rvs.boardSize + 200;
 		setSize(width, height); // アップレットのサイズを指定
@@ -39,7 +42,6 @@ public class Main extends Applet implements MouseListener {
 	public void start() {
 		// TODO 自動生成されたメソッド・スタブ
 		super.start();
-		rvs.initBoard();
 	}
 
 	/*
@@ -67,19 +69,20 @@ public class Main extends Applet implements MouseListener {
 	public void paint(Graphics g) {
 		// TODO 自動生成されたメソッド・スタブ
 		Dimension size = getSize();
-		// 背景色の設定
+		
+        // 背景色の設定
 		g.setColor(Color.white);
 		g.fillRect(0, 0, size.width - 1, size.height - 1);
 
 		showBoard(g); // 盤の表示
 
 		rvs.setDisks(g);
+
+        // テキストの設定
 		int textY = rvs.start[1] + rvs.height * rvs.boardSize + 50;
 		g.setColor(Color.white);
 		g.fillRect(rvs.start[0], textY, 200, 100);
-
 		g.setColor(Color.black);
-
 		Font fnt = new Font("SansSerif", Font.BOLD, 22);
 		g.setFont(fnt);
 		if (isPlaying) {
@@ -90,7 +93,7 @@ public class Main extends Applet implements MouseListener {
 				msg = "白の番です";
 				g.drawString(msg, rvs.start[0], textY);
 			}
-		} else {
+		} else { // 石が置けない場合
 			msg = rvs.getWinner();
 			g.drawString(msg, rvs.start[0], textY);
 			destroy();
@@ -115,7 +118,10 @@ public class Main extends Applet implements MouseListener {
 	public void update() {
 		// TODO 自動生成されたメソッド・スタブ
 	}
-
+    
+    /*
+     * マウスをクリックした時の動作
+     */
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO 自動生成されたメソッド・スタブ
@@ -123,16 +129,16 @@ public class Main extends Applet implements MouseListener {
 		int y = e.getY();
 		boolean onBoard = x > rvs.start[0] && x < rvs.start[0] + rvs.width * rvs.boardSize && y > rvs.start[1]
 				&& y < rvs.start[1] + rvs.height * rvs.boardSize;
-		if (onBoard) {
+		if (onBoard) { // 盤の上でクリックした場合
 			int i = (int) ((x - rvs.start[0]) / rvs.width);
 			int j = (int) ((y - rvs.start[1]) / rvs.height);
-			if (rvs.enablePlace(i, j, rvs.turn)) {
+			if (rvs.enablePlace(i, j, rvs.turn)) { // 置くことができるとき
 				rvs.reverseDisks(i, j);
-				rvs.turn = rvs.turn ? false : true;
+				rvs.turn = rvs.turn ? false : true; // 相手のターンに変更
 				if (!rvs.enablePlace(rvs.turn)) {
 					rvs.turn = rvs.turn ? false : true;
-					if (!rvs.enablePlace(rvs.turn)) {
-						isPlaying = false;
+					if (!rvs.enablePlace(rvs.turn)) { // 両者ともに石が置けなくなった場合
+						isPlaying = false; // ゲーム終了
 					}
 				}
 			}
@@ -166,6 +172,7 @@ public class Main extends Applet implements MouseListener {
 
 	}
 
+    // 盤の描画
 	public void showBoard(Graphics g) {
 		int width = rvs.width;
 		int height = rvs.height;

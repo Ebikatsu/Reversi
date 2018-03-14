@@ -47,7 +47,9 @@ public class Reversi {
 	}
 
 	/**
-	 * 石を配置する
+	 * 石の配置を描画する
+     *
+     * @param g
 	 */
 	public void setDisks(Graphics g) {
 		for (int i = 0; i < boardSize; i++) {
@@ -73,7 +75,7 @@ public class Reversi {
 	 *                置きたいマスのx軸方向の位置
 	 * @param j
 	 *                置きたいマスのy軸方向の位置
-	 * @return place 置けるかどうか )
+	 * @return place 置けるかどうか
 	 */
 	public boolean enablePlace(int i, int j, boolean turn) {
 		boolean place = false;
@@ -218,6 +220,14 @@ public class Reversi {
 
 	/**
 	 * 石を置けるかどうか判定
+     *
+     * @param turn 
+     *      if(turn==true)  黒が置けるかを判定
+     *      if(turn==false) 白が置けるかを判定
+     * @return place
+     *      if(place==true)  石が置ける
+     *      if(place==false) 石が置けない
+     *
 	 */
 	public boolean enablePlace(boolean turn) {
 		boolean place = false;
@@ -230,7 +240,8 @@ public class Reversi {
 	}
 
 	/**
-	 *
+	 * 石を反転させる
+     *
 	 * @param i
 	 * @param j
 	 */
@@ -238,33 +249,36 @@ public class Reversi {
 		int myDisk = turn ? 1 : 2;
 
 		for (int k = 0; k < boardSize; k++) {
-			if (k <= changeNum[0]) {
+			if (k <= changeNum[0]) { // 左上
 				board[i - k][j - k] = myDisk;
 			}
-			if (k <= changeNum[1]) {
+			if (k <= changeNum[1]) { // 上
 				board[i][j - k] = myDisk;
 			}
-			if (k <= changeNum[2]) {
+			if (k <= changeNum[2]) { // 右上
 				board[i + k][j - k] = myDisk;
 			}
-			if (k <= changeNum[3]) {
+			if (k <= changeNum[3]) { // 右
 				board[i + k][j] = myDisk;
 			}
-			if (k <= changeNum[4]) {
+			if (k <= changeNum[4]) { // 右下
 				board[i + k][j + k] = myDisk;
 			}
-			if (k <= changeNum[5]) {
+			if (k <= changeNum[5]) { // 下
 				board[i][j + k] = myDisk;
 			}
-			if (k <= changeNum[6]) {
+			if (k <= changeNum[6]) { // 左下
 				board[i - k][j + k] = myDisk;
 			}
-			if (k <= changeNum[7]) {
+			if (k <= changeNum[7]) { // 左
 				board[i - k][j] = myDisk;
 			}
 		}
 	}
 
+    /*
+     * 両者の石の数を数える
+     */
 	public void countDisk() {
 		diskCounts[0] = 0;
 		diskCounts[1] = 0;
@@ -278,6 +292,9 @@ public class Reversi {
 		}
 	}
 
+    /*
+     * 勝敗を示すテキストを取得する
+     */
 	public String getWinner() {
 		String winner = "";
 		countDisk();
