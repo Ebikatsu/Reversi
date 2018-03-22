@@ -2,6 +2,7 @@ package reversi;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Reversi {
@@ -27,6 +28,7 @@ public class Reversi {
 	int[][] board = new int[boardSize][boardSize];
 	boolean turn = true; //
 	int[] diskCounts = { 2, 2 }; // 石の数
+	ArrayList<Integer> checkPlace = new ArrayList<Integer>(); // 置けるかどうか確認する場所
 
 	/**
 	 * 石の配置の初期化
@@ -47,9 +49,61 @@ public class Reversi {
 	}
 
 	/**
+	 * checkPlace の初期化 盤面の初期状態の石の周り12か所すべてを追加
+	 */
+	public void initCheckPlace() {
+		checkPlace = new ArrayList<Integer>();
+		int cx = (int) (boardSize / 2) - 1;
+		int cy = (int) (boardSize / 2) - 1;
+
+		checkPlace.add((cy - 1) * boardSize + (cx - 1));
+		checkPlace.add((cy - 1) * boardSize + cx);
+		checkPlace.add((cy - 1) * boardSize + (cx + 1));
+		checkPlace.add((cy - 1) * boardSize + (cx + 2));
+		checkPlace.add(cy * boardSize + (cx - 1));
+		checkPlace.add(cy * boardSize + (cx + 1));
+		checkPlace.add((cy + 1) * boardSize + (cx - 1));
+		checkPlace.add((cy + 1) * boardSize + (cx + 1));
+		checkPlace.add((cy + 2) * boardSize + (cx - 1));
+		checkPlace.add((cy + 2) * boardSize + cx);
+		checkPlace.add((cy + 2) * boardSize + (cx + 1));
+		checkPlace.add((cy + 2) * boardSize + (cx + 2));
+	}
+
+	public void updateCheckPlace(int x, int y) {
+		if (x - 1 >= 0 && y - 1 >= 0 && x - 1 < boardSize && y - 1 < boardSize && board[x - 1][y - 1] == 0) {
+			checkPlace.add((y - 1) * boardSize + (x - 1));
+		}
+		if (x - 1 >= 0 && y >= 0 && x - 1 < boardSize && y < boardSize && board[x - 1][y] == 0) {
+			checkPlace.add(y * boardSize + (x - 1));
+		}
+		if (x - 1 >= 0 && y + 1 >= 0 && x - 1 < boardSize && y + 1 < boardSize && board[x - 1][y + 1] == 0) {
+			checkPlace.add((y + 1) * boardSize + (x - 1));
+		}
+		if (x >= 0 && y - 1 >= 0 && x < boardSize && y - 1 < boardSize && board[x][y - 1] == 0) {
+			checkPlace.add((y - 1) * boardSize + (x));
+		}
+		if (x >= 0 && y + 1 >= 0 && x < boardSize && y + 1 < boardSize && board[x][y + 1] == 0) {
+			checkPlace.add((y + 1) * boardSize + (x));
+		}
+		if (x + 1 >= 0 && y - 1 >= 0 && x + 1 < boardSize && y - 1 < boardSize && board[x + 1][y - 1] == 0) {
+			checkPlace.add((y - 1) * boardSize + (x + 1));
+		}
+		if (x + 1 >= 0 && y >= 0 && x + 1 < boardSize && y < boardSize && board[x + 1][y] == 0) {
+			checkPlace.add(y * boardSize + (x + 1));
+		}
+		if (x + 1 >= 0 && y + 1 >= 0 && x + 1 < boardSize && y + 1 < boardSize && board[x + 1][y + 1] == 0) {
+			checkPlace.add((y + 1) * boardSize + (x + 1));
+		}
+		if (x >= 0 && y >= 0 && x < boardSize && y < boardSize && board[x][y] != 0) {
+			checkPlace.remove((Integer) (y * boardSize + x));
+		}
+	}
+
+	/**
 	 * 石の配置を描画する
-     *
-     * @param g
+	 *
+	 * @param g
 	 */
 	public void setDisks(Graphics g) {
 		for (int i = 0; i < boardSize; i++) {
@@ -220,28 +274,25 @@ public class Reversi {
 
 	/**
 	 * 石を置けるかどうか判定
-     *
-     * @param turn 
-     *      if(turn==true)  黒が置けるかを判定
-     *      if(turn==false) 白が置けるかを判定
-     * @return place
-     *      if(place==true)  石が置ける
-     *      if(place==false) 石が置けない
-     *
+	 *
+	 * @param turn
+	 *                if(turn==true) 黒が置けるかを判定 if(turn==false) 白が置けるかを判定
+	 * @return place if(place==true) 石が置ける if(place==false) 石が置けない
+	 *
 	 */
 	public boolean enablePlace(boolean turn) {
 		boolean place = false;
-		for (int i = 0; i < boardSize; i++) {
-			for (int j = 0; j < boardSize; j++) {
-				place |= enablePlace(i, j, turn);
-			}
+		for (int n : checkPlace) {
+			int i = n % boardSize;
+			int j = n / boardSize;
+			place |= enablePlace(i, j, turn);
 		}
 		return place;
 	}
 
 	/**
 	 * 石を反転させる
-     *
+	 *
 	 * @param i
 	 * @param j
 	 */
@@ -276,9 +327,9 @@ public class Reversi {
 		}
 	}
 
-    /*
-     * 両者の石の数を数える
-     */
+	/**
+	 * 両者の石の数を数える
+	 */
 	public void countDisk() {
 		diskCounts[0] = 0;
 		diskCounts[1] = 0;
@@ -292,15 +343,15 @@ public class Reversi {
 		}
 	}
 
-    /*
-     * 勝敗を示すテキストを取得する
-     */
+	/**
+	 * 勝敗を示すテキストを取得する
+	 */
 	public String getWinner() {
 		String winner = "";
 		countDisk();
-		if(diskCounts[0]>diskCounts[1]) {
+		if (diskCounts[0] > diskCounts[1]) {
 			winner = "黒の勝ちです";
-		} else if(diskCounts[0]<diskCounts[1]) {
+		} else if (diskCounts[0] < diskCounts[1]) {
 			winner = "白の勝ちです";
 		} else {
 			winner = "引き分けです";
