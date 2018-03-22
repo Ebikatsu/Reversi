@@ -1,5 +1,10 @@
 \documentclass[10.5pt, a4paper]{jsarticle}
 
+\usepackage{fancybox}
+\usepackage{listings, jlisting}
+\usepackage[dvipdfmx]{graphicx, color}
+\usepackage{here}
+
 \title{技術レポート}
 \author{島根大学 渡邉直樹}
 \date{3月26日}
@@ -8,11 +13,17 @@
 
 \maketitle
 
-\subsection{概要}
+\section{概要}
 
-\subsection{動機}
+\section{動機}
+私はリバーシを作ろうと考えた理由はJavaの練習をするためです。リバーシを制作する中で、条件分岐や繰り返し処理を多く使用すると考え、リバーシを選択しました。また、盤面上でのクリック等、操作がシンプルでJavaアップレットでの再現ができそうだったのでリバーシを選択しました。
 
-\subsection{説明}
+\section{説明}
+\fbox{Mainクラス}
+主にアップレットの操作とクリック時の処理を記す。
+
+\fbox{Reversiクラス}
+主にリバーシにおける操作による処理を記す。
 
 \end{document}
 
