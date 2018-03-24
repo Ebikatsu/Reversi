@@ -4,6 +4,8 @@
 \usepackage{listings, jlisting}
 \usepackage[dvipdfmx]{graphicx, color}
 \usepackage{here}
+\usepackage{url}
+\usepackage[top=30truemm,bottom=30truemm,left=25truemm,right=25truemm]{geometry}
 
 \title{技術レポート}
 \author{島根大学 渡邉直樹}
@@ -97,7 +99,7 @@ MouseListenerインターフェイスからオーバーライドしたもので�
 
       \begin{minipage}{0.33\hsize}
         \begin{center}
-          \includegraphics[clip, width=4.5cm]{./image/img02.png}
+            \includegraphics[clip, width=4.5cm]{./image/img02.png}
           \hspace{1.6cm} [2]黒が勝利
         \end{center}
       \end{minipage}
@@ -142,12 +144,14 @@ MouseListenerインターフェイスからオーバーライドしたもので�
   \end{center}
 \end{figure}
 
-
 \section{感想}
 実際にJavaアップレットでリバーシを作成してみて、for文の範囲を設定する際、方向に応じて設定する範囲が異なり、難しく感じた。
 処理内容をどちらのクラスに書くべきかを決めるのが大変だった。
 しかし、完成した際には、最初に作ったものよりも段々と効率化していて、よりよいものができたのでよかった。
 特に、リストを用いたことで置けるかどうかを判定する処理が格段に速くなったことに喜びを感じた。
+
+\section{リンク}
+\url{https://github.com/Ebikatsu/Reversi.git}
 
 \end{document}
 
