@@ -1,7 +1,5 @@
 package reversi;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -11,7 +9,7 @@ public class Reversi {
 		// TODO 自動生成されたコンストラクター・スタブ
 	}
 
-	int boardSize = 8; // 1列のマスの数
+	int boardSize = 12; // 1列のマスの数
 	int[] start = { 30, 30 }; // 盤面の位置
 	int width = 50; // マスの横幅
 	int height = 50; // マスの縦幅
@@ -97,28 +95,6 @@ public class Reversi {
 		}
 		if (x >= 0 && y >= 0 && x < boardSize && y < boardSize && board[x][y] != 0) {
 			checkPlace.remove((Integer) (y * boardSize + x));
-		}
-	}
-
-	/**
-	 * 石の配置を描画する
-	 *
-	 * @param g
-	 */
-	public void setDisks(Graphics g) {
-		for (int i = 0; i < boardSize; i++) {
-			for (int j = 0; j < boardSize; j++) {
-				int x = start[0] + width * i + (int) (width * 0.1);
-				int y = start[1] + height * j + (int) (height * 0.1);
-
-				if (board[i][j] == 1) {
-					g.setColor(Color.black);
-					g.fillOval(x, y, (int) (width * 0.8), (int) (height * 0.8));
-				} else if (board[i][j] == 2) {
-					g.setColor(Color.white);
-					g.fillOval(x, y, (int) (width * 0.8), (int) (height * 0.8));
-				}
-			}
 		}
 	}
 
