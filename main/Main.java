@@ -71,7 +71,7 @@ public class Main extends Applet implements MouseListener {
 
 		showBoard(g); // 盤の表示
 
-		rvs.setDisks(g);
+		setDisks(g);
 		int textY = rvs.start[1] + rvs.height * rvs.boardSize + 50;
 		g.setColor(Color.white);
 		g.fillRect(rvs.start[0], textY, 200, 100);
@@ -144,21 +144,25 @@ public class Main extends Applet implements MouseListener {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO 自動生成されたメソッド・スタブ
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO 自動生成されたメソッド・スタブ
+
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		// TODO 自動生成されたメソッド・スタブ
+
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
 		// TODO 自動生成されたメソッド・スタブ
+
 	}
 
 	public void showBoard(Graphics g) {
@@ -179,6 +183,28 @@ public class Main extends Applet implements MouseListener {
 				} else {
 					g.setColor(Color.black);
 					g.drawRect(x0, y0, width - 1, height - 1);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 石の配置を描画する
+	 *
+	 * @param g
+	 */
+	public void setDisks(Graphics g) {
+		for (int i = 0; i < rvs.boardSize; i++) {
+			for (int j = 0; j < rvs.boardSize; j++) {
+				int x = rvs.start[0] + rvs.width * i + (int) (rvs.width * 0.1);
+				int y = rvs.start[1] + rvs.height * j + (int) (rvs.height * 0.1);
+
+				if (rvs.board[i][j] == 1) {
+					g.setColor(Color.black);
+					g.fillOval(x, y, (int) (rvs.width * 0.8), (int) (rvs.height * 0.8));
+				} else if (rvs.board[i][j] == 2) {
+					g.setColor(Color.white);
+					g.fillOval(x, y, (int) (rvs.width * 0.8), (int) (rvs.height * 0.8));
 				}
 			}
 		}
