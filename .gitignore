@@ -1,0 +1,7 @@
+test/
+*.tex
+*.dvi
+*.aux
+*.log
+*.class
+
