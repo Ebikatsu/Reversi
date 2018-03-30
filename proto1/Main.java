@@ -53,7 +53,7 @@ public class Main extends Applet implements MouseListener {
 			}
 		}
 		setDisks(g);
-        int textY = start[1] + height*boardSize+20;
+		int textY = start[1] + height*boardSize+20;
 		g.setColor(Color.white);
 		g.fillRect(start[0], textY, 200, 100);
 
